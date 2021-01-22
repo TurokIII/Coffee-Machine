@@ -1,5 +1,13 @@
 package machine
 
+data class CoffeeMachine(
+        var money: Int = 550,
+        var water: Int = 400,
+        var milk: Int = 540,
+        var beans: Int = 120,
+        var cups: Int = 9
+)
+
 fun main() {
 //    println("Write how many ml of water the coffee machine has: ")
 //    val water = readLine()!!.toInt()
@@ -12,60 +20,138 @@ fun main() {
 //    val cupCapacity = getMaximumCups(water, milk, beans)
 //
 //    checkRequestedCups(requestedCups, cupCapacity)
-    val money = 550
-    val water = 400
-    val milk = 540
-    val beans = 120
-    val cups = 9
 
-    printState(cups, water, milk, beans, money)
-    askAction(cups, water, milk, beans, money)
+    val machine = CoffeeMachine()
+
+    askAction(machine)
 
 }
 
-fun askAction(cups: Int, water: Int, milk: Int, beans: Int, money: Int) {
-    println("Write action (buy, fill, take):")
-    val action = readLine()!!
+fun askAction(machine: CoffeeMachine) {
+    while (true) {
+        println()
+        println("Write action (buy, fill, take, remaining exit):")
+        val action = readLine()!!
 
-    when (action) {
-        "buy" -> buyCoffee(cups,water, milk, beans, money)
-        "fill" -> fillMachine(cups, water, milk, beans, money)
-        "take" -> takeMoney(cups, water, milk, beans, money)
+        when (action) {
+            "buy" -> buyCoffee(machine)
+            "fill" -> fillMachine(machine)
+            "take" -> takeMoney(machine)
+            "remaining" -> printState(machine)
+            "exit" -> break
+        }
     }
 }
 
-fun buyCoffee(cups: Int, water: Int, milk: Int, beans: Int, money: Int) {
-    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino")
+fun buyCoffee(machine: CoffeeMachine) {
+    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:")
     val coffeeChoice = readLine()!!
 
     println()
 
     when (coffeeChoice) {
-        "1" -> printState(cups - 1,water - 250, milk, beans - 16, money + 4)
-        "2" -> printState(cups - 1, water - 350, milk - 75, beans - 20, money + 7)
-        "3" -> printState(cups - 1, water - 200, milk - 100, beans - 12, money + 6)
+        "1" -> makeEspresso(machine)
+        "2" -> makeLatte(machine)
+        "3" -> makeCappuccino(machine)
+        "back" -> {}
     }
+
 }
 
-fun fillMachine(cups: Int, water: Int, milk: Int, beans: Int, money: Int) {
+fun makeEspresso(machine: CoffeeMachine) {
+    if (machine.cups <= 0) {
+        println("Sorry, not enough cups!")
+        return
+    }
+    if (machine.water < 250) {
+        println("Sorry, not enough water!")
+        return
+    }
+    if (machine.beans < 16) {
+        println("Sorry, not enough beans!")
+        return
+    }
+
+    machine.cups--
+    machine.water -= 250
+    machine.beans -= 16
+    machine.money += 4
+
+    println("I have enough resources, making you a coffee!")
+}
+
+fun makeLatte(machine: CoffeeMachine) {
+    if (machine.cups <= 0) {
+        println("Sorry, not enough cups!")
+        return
+    }
+    if (machine.water < 350) {
+        println("Sorry, not enough water!")
+        return
+    }
+    if (machine.milk < 75) {
+        println("Sorry, not enough milk!")
+        return
+    }
+    if (machine.beans < 20) {
+        println("Sorry, not enough beans!")
+        return
+    }
+
+    machine.cups--
+    machine.water -= 350
+    machine.milk -= 75
+    machine.beans -= 20
+    machine.money += 7
+
+    println("I have enough resources, making you a coffee!")
+}
+
+fun makeCappuccino(machine: CoffeeMachine) {
+    if (machine.cups <= 0) {
+        println("Sorry, not enough cups!")
+        return
+    }
+    if (machine.water < 200) {
+        println("Sorry, not enough water!")
+        return
+    }
+    if (machine.milk < 100) {
+        println("Sorry, not enough milk!")
+        return
+    }
+    if (machine.beans < 12) {
+        println("Sorry, not enough beans!")
+        return
+    }
+
+    machine.cups--
+    machine.water -= 200
+    machine.milk -= 100
+    machine.beans -= 12
+    machine.money += 6
+
+    println("I have enough resources, making you a coffee!")
+}
+
+fun fillMachine(machine: CoffeeMachine) {
     println("Write how many ml of water do you want to add:")
-    val newWater = readLine()!!.toInt()
+    machine.water += readLine()!!.toInt()
     println("Write how many ml of milk do you want to add:")
-    val newMilk = readLine()!!.toInt()
+    machine.milk += readLine()!!.toInt()
     println("Write how many grams of coffee beans do you want to add:")
-    val newBeans = readLine()!!.toInt()
+    machine.beans += readLine()!!.toInt()
     println("Write how many disposable cups of coffee do you want to add:")
-    val newCups = readLine()!!.toInt()
+    machine.cups += readLine()!!.toInt()
 
     println()
-
-    printState(cups + newCups, water + newWater, milk + newMilk, beans + newBeans, money)
 }
 
-fun takeMoney(cups: Int, water: Int, milk: Int, beans: Int, money: Int) {
-    println("I gave you $$money")
+fun takeMoney(machine: CoffeeMachine) {
+    println("I gave you $${machine.money}")
     println()
-    printState(cups, water, milk, beans, 0)
+
+    machine.money = 0
 }
 
 fun checkRequestedCups(requestedCups: Int, cupCapacity: Int) {
@@ -109,11 +195,11 @@ fun getReqBeans(cups: Int): Int {
     return cups * 15
 }
 
-fun printState(cups: Int, water: Int, milk: Int, beans: Int, money: Int) {
+fun printState(machine: CoffeeMachine) {
     println("The coffee machine has:")
-    println("$water of water")
-    println("$milk of milk")
-    println("$beans of coffee beans")
-    println("$cups of disposable cups")
-    println("$money of money")
+    println("${machine.water} of water")
+    println("${machine.milk} of milk")
+    println("${machine.beans} of coffee beans")
+    println("${machine.cups} of disposable cups")
+    println("$${machine.money} of money")
 }
